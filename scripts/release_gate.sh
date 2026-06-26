@@ -29,10 +29,14 @@ name_one="mi""ke"
 name_two="sar""ah"
 name_three="rob""ert"
 
-term_pattern="${brand_term}|${niche_phrase}|${offer_phrase}|${responses_phrase}|${survey_count}"
+# The project's own public repo URL legitimately contains the org name, so the
+# brand-term check excludes that exact URL while still catching any other mention.
+repo_url_slug="github.com/StartupBros/synthetic-panel"
+other_pattern="${niche_phrase}|${offer_phrase}|${responses_phrase}|${survey_count}"
 name_pattern="\\<(${name_one}|${name_two}|${name_three})\\>"
 term_hits="$({
-  git grep -nIi -E "$term_pattern" -- . || true
+  git grep -nIi -E "$brand_term" -- . | grep -viF "$repo_url_slug" || true
+  git grep -nIi -E "$other_pattern" -- . || true
   git grep -nIi -E "$name_pattern" -- . || true
 } | sort -u)"
 
