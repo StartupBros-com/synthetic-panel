@@ -1,5 +1,8 @@
 # synthetic-panel
 
+[![CI](https://github.com/StartupBros/synthetic-panel/actions/workflows/ci.yml/badge.svg)](https://github.com/StartupBros/synthetic-panel/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 An open-source, calibrated synthetic customer panel — no API key required.
 
 `synthetic-panel` helps you compare how different messages, offers, headlines, or product ideas resonate with a synthetic customer panel. v1 is designed for relative ranking: it is best at answering "which variant resonates more?" Absolute 1-5 scores are directional, not a promise of market truth. Niche-specific calibration is a future upgrade.
