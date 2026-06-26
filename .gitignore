@@ -1,0 +1,12 @@
+calibration_data/
+*.gz
+*.csv
+*.db
+.env
+.venv/
+__pycache__/
+*.pyc
+.cache/
+.ruff_cache/
+.pytest_cache/
+uv.lock

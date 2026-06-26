@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "synthetic-panel"
+version = "0.1.0"
+description = "Synthetic panel scoring utilities"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "synthetic-panel contributors" },
+]
+dependencies = [
+  "pyyaml",
+  "numpy",
+  "polars",
+  "sentence-transformers",
+  "rich",
+]
+
+[project.scripts]
+synthetic-panel = "synthetic_panel.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["synthetic_panel"]
+
+[tool.pytest.ini_options]
+markers = [
+  "slow: tests that download or run local ML models",
+  "model_dependent: tests whose exact behavior depends on an embedding model",
+]

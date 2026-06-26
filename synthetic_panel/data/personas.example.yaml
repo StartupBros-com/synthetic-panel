@@ -1,0 +1,24 @@
+alex:
+  name: Alex Chen
+  demographics:
+    age: 34
+    location: Austin, Texas
+    family: Married, one child
+    occupation: SaaS founder
+    income: "$145,000 household income"
+priya:
+  name: Priya Nair
+  demographics:
+    age: 29
+    location: Chicago, Illinois
+    family: Single
+    occupation: Professional skills learner
+    income: "$82,000 annual income"
+jordan:
+  name: Jordan Ellis
+  demographics:
+    age: 46
+    location: Raleigh, North Carolina
+    family: Partnered, two children
+    occupation: Local-services customer
+    income: "$118,000 household income"

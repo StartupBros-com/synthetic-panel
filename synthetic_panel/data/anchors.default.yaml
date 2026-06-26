@@ -1,0 +1,18 @@
+set_1:
+  1: "I would definitely pass on this and would not take any further action."
+  2: "I am mostly uninterested and would need a much stronger reason to continue."
+  3: "I might consider it, but I would need more clarity before deciding."
+  4: "I am interested enough to learn more and compare the details."
+  5: "I would be highly inclined to take the next step soon."
+set_2:
+  1: "This feels irrelevant to me and I would move on immediately."
+  2: "This does not feel compelling enough for me to act right now."
+  3: "This has some potential, but my interest is still uncertain."
+  4: "This seems relevant and I would seriously consider following up."
+  5: "This strongly matches what I want and I would be ready to proceed."
+set_3:
+  1: "I see no practical reason to engage with this."
+  2: "I would probably skip this unless important details changed."
+  3: "I am neutral and would want more evidence before taking action."
+  4: "I can see clear value and would be likely to continue."
+  5: "I feel confident this is worth pursuing now."
