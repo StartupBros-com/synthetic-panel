@@ -18,7 +18,7 @@ jobs:
         run: uv python install 3.12
 
       - name: Cache HuggingFace model
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/huggingface
           key: hf-minilm-${{ runner.os }}
