@@ -25,11 +25,16 @@ jobs:
 
       - name: Install package + test deps
         run: |
-          uv venv
-          uv pip install -e . pytest
+          uv sync --locked --python 3.12
+          uv pip install pytest
 
       - name: Run tests
-        run: uv run python -m pytest tests/ -q
+        run: uv run --locked python -m pytest tests/ -q
+
+      - name: Verify dependency consistency and unchanged lockfile
+        run: |
+          uv pip check
+          git diff --exit-code -- uv.lock
 
       - name: Release gate (no proprietary data/PII)
         run: bash scripts/release_gate.sh
