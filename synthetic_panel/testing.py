@@ -18,7 +18,10 @@ import uuid
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import anthropic
 
 from rich.console import Console
 from rich.panel import Panel
@@ -766,7 +769,7 @@ async def _submit_and_poll_batch(
             await asyncio.sleep(poll_interval)
 
     # Report final status
-    console.print(f"\n[bold green]Batch complete![/bold green]")
+    console.print("\n[bold green]Batch complete![/bold green]")
     console.print(f"  Succeeded: {batch.request_counts.succeeded}")
     if batch.request_counts.errored > 0:
         console.print(f"  [red]Errored: {batch.request_counts.errored}[/red]")
@@ -1157,7 +1160,6 @@ async def run_test_batch(
     # If everything is cached, skip the batch API entirely
     if total_requests == 0:
         console.print("[green]All variations cached - no API calls needed![/green]")
-        client_info = get_llm_client()
         all_results = {}
         for persona_name in test_personas:
             results_list = []
