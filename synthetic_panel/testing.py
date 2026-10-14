@@ -491,7 +491,7 @@ def test_variation(
 
     # Average scores and distributions
     avg_score = sum(all_scores) / len(all_scores)
-    avg_probs = [sum(p[i] for p in all_probs) / len(all_probs) for i in range(5)]
+    avg_probs = _average_distributions(all_probs)
 
     # Scoring method: "ssr" if all succeeded, "ssr_partial" if some failed
     final_method = "ssr" if failed_samples == 0 else "ssr_partial"
@@ -577,7 +577,7 @@ async def test_variation_async(
 
     # Average scores and distributions
     avg_score = sum(all_scores) / len(all_scores)
-    avg_probs = [sum(p[i] for p in all_probs) / len(all_probs) for i in range(5)]
+    avg_probs = _average_distributions(all_probs)
 
     final_method = "ssr" if failed_samples == 0 else "ssr_partial"
 
@@ -917,9 +917,7 @@ def _process_batch_results(
 
             # Average across samples
             avg_score = sum(scores) / len(scores)
-            avg_probs = [
-                sum(d[i] for d in distributions) / len(distributions) for i in range(5)
-            ]
+            avg_probs = _average_distributions(distributions)
 
             method = "ssr" if failed_samples == 0 else "ssr_partial"
             persona_results.append(
@@ -1650,7 +1648,7 @@ def track_predictions(
 
         # Average distributions
         dists = variation_distributions[content]
-        avg_dist = [sum(d[j] for d in dists) / len(dists) for j in range(5)]
+        avg_dist = _average_distributions(dists)
 
         aggregated_results.append(
             {
