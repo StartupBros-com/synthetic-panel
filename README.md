@@ -1,6 +1,6 @@
 # synthetic-panel
 
-[![CI](https://github.com/StartupBros/synthetic-panel/actions/workflows/ci.yml/badge.svg)](https://github.com/StartupBros/synthetic-panel/actions/workflows/ci.yml)
+[![CI](https://github.com/StartupBros-com/synthetic-panel/actions/workflows/ci.yml/badge.svg)](https://github.com/StartupBros-com/synthetic-panel/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 An open-source, calibrated synthetic customer panel — no API key required.
@@ -11,10 +11,14 @@ Scoring uses Semantic Similarity Rating (SSR), following the method described in
 
 ## Quickstart
 
+On Linux, select the CPU backend to avoid downloading unneeded CUDA dependencies:
+
 ```bash
-uv tool install git+https://github.com/StartupBros/synthetic-panel@v0.1.0
+uv tool install --torch-backend cpu git+https://github.com/StartupBros-com/synthetic-panel@v0.1.0
 synthetic-panel --help
 ```
+
+On macOS and other platforms, omit `--torch-backend cpu` and use the default backend. Run only the install command for your platform.
 
 For local development from a checkout:
 
