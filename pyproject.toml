@@ -7,7 +7,7 @@ name = "synthetic-panel"
 version = "0.1.0"
 description = "Synthetic panel scoring utilities"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.15.2"
 license = "MIT"
 authors = [
   { name = "synthetic-panel contributors" },
