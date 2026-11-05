@@ -64,6 +64,10 @@ Optional API embedding providers can be configured with `SSR_EMBEDDING_PROVIDER=
 - Local embedding quality depends on the selected sentence-transformers model.
 - Calibration against real customers, domain-specific anchors, and benchmark datasets is planned future work.
 
+---
+
+*Made by [Will Mitchell](https://github.com/StartupBros), who builds with Claude Code every day. The setup is free: [hov-stack](https://github.com/StartupBros-com/hov-stack). If you don't code for a living and want to build with AI, [House of Vibe](https://houseofvibe.ai/?utm_source=github&utm_medium=repo&utm_campaign=synthetic-panel) is for you.*
+
 ## License
 
 MIT. See `LICENSE`.
