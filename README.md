@@ -66,7 +66,7 @@ Optional API embedding providers can be configured with `SSR_EMBEDDING_PROVIDER=
 
 ---
 
-*Made by [Will Mitchell](https://github.com/StartupBros), who builds with Claude Code every day. The setup is free: [hov-stack](https://github.com/StartupBros-com/hov-stack). If you don't code for a living and want to build with AI, [House of Vibe](https://houseofvibe.ai/?utm_source=github&utm_medium=repo&utm_campaign=synthetic-panel) is for you.*
+*Made by Will Mitchell, who builds with Claude Code every day. If you don't code for a living and want to build with AI, [House of Vibe](https://houseofvibe.ai/?utm_source=github&utm_medium=repo&utm_campaign=synthetic-panel) is for you.*
 
 ## License
 
