@@ -155,6 +155,18 @@ def resolve_persona_names(
     return [requested_persona]
 
 
+def _get_embedding_config() -> tuple[str, str]:
+    """Resolve the embedding identity shared by cache keys and fingerprints."""
+    embedding_provider = os.environ.get("SSR_EMBEDDING_PROVIDER", "local").lower()
+    if embedding_provider == "gemini":
+        embedding_model = os.environ.get("SSR_EMBEDDING_MODEL", "gemini-embedding-001")
+    elif embedding_provider == "openai":
+        embedding_model = os.environ.get("SSR_EMBEDDING_MODEL", "provider-default")
+    else:
+        embedding_model = os.environ.get("SSR_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+    return embedding_provider, embedding_model
+
+
 def get_config_fingerprint(personas_tested: list[str] | None = None) -> dict:
     """
     Generate a configuration fingerprint capturing all scoring-relevant settings.
@@ -176,13 +188,7 @@ def get_config_fingerprint(personas_tested: list[str] | None = None) -> dict:
     llm_model = os.environ.get("SSR_MODEL", "agent-provided")
 
     # Get embedding config
-    embedding_provider = os.environ.get("SSR_EMBEDDING_PROVIDER", "local").lower()
-    if embedding_provider == "gemini":
-        embedding_model = os.environ.get("SSR_EMBEDDING_MODEL", "gemini-embedding-001")
-    elif embedding_provider == "openai":
-        embedding_model = os.environ.get("SSR_EMBEDDING_MODEL", "provider-default")
-    else:
-        embedding_model = os.environ.get("SSR_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+    embedding_provider, embedding_model = _get_embedding_config()
 
     # Get SSR algorithm config
     dist_temperature = float(os.environ.get("SSR_DIST_TEMPERATURE", "1.0"))
