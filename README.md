@@ -1,9 +1,9 @@
 # synthetic-panel
 
+An open-source synthetic customer panel for testing marketing copy. No API key required.
+
 [![CI](https://github.com/StartupBros-com/synthetic-panel/actions/workflows/ci.yml/badge.svg)](https://github.com/StartupBros-com/synthetic-panel/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-An open-source, calibrated synthetic customer panel — no API key required.
 
 `synthetic-panel` helps you compare how different messages, offers, headlines, or product ideas resonate with a synthetic customer panel. v1 is designed for relative ranking: it is best at answering "which variant resonates more?" Absolute 1-5 scores are directional, not a promise of market truth. Niche-specific calibration is a future upgrade.
 
@@ -14,7 +14,7 @@ Scoring uses Semantic Similarity Rating (SSR), following the method described in
 On Linux, select the CPU backend to avoid downloading unneeded CUDA dependencies:
 
 ```bash
-uv tool install --torch-backend cpu git+https://github.com/StartupBros-com/synthetic-panel@v0.1.0
+uv tool install --torch-backend cpu git+https://github.com/StartupBros-com/synthetic-panel@v0.1.1
 synthetic-panel --help
 ```
 
@@ -27,6 +27,34 @@ uv venv
 uv pip install -e .
 uv run synthetic-panel --help
 ```
+
+## Example
+
+A real run from November 7, 2026, from a checkout of this repo: the three example personas included in the package (a SaaS founder, a skills learner and a local-services customer), two samples each, against [`examples/saas_headline_trio.json`](examples/saas_headline_trio.json).
+
+```bash
+synthetic-panel emit-prompts \
+  --persona-file synthetic_panel/data/personas.example.yaml \
+  --variants-file examples/saas_headline_trio.json \
+  --stimulus-type headline --n-samples 2 --output prompts.json
+# Claude wrote one reaction per prompt, each in its own context, into reactions.json
+synthetic-panel score-reactions reactions.json
+```
+
+```text
+Comparability: comparable
+Comparable directional ranking. Absolute scores are directional only.
+         Directional Ranking
+┏━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┓
+┃ Rank ┃ Variant ┃ Directional Score ┃
+┡━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━┩
+│ 1    │ plain   │ 3.052             │
+│ 2    │ outcome │ 2.999             │
+│ 3    │ proof   │ 2.913             │
+└──────┴─────────┴───────────────────┘
+```
+
+The spread is small because only the founder is the audience for these headlines; the founder alone scored them 3.39, 3.20 and 3.19. The reactions and the full results are in [`examples/sample-run/`](examples/sample-run/).
 
 ## How It Works
 
@@ -68,10 +96,6 @@ Optional API embedding providers can be configured with `SSR_EMBEDDING_PROVIDER=
 - Local embedding quality depends on the selected sentence-transformers model.
 - Calibration against real customers, domain-specific anchors, and benchmark datasets is planned future work.
 
----
-
-*Made by Will Mitchell, who builds with Claude Code every day. If you don't code for a living and want to build with AI, [House of Vibe](https://houseofvibe.ai/?utm_source=github&utm_medium=repo&utm_campaign=synthetic-panel) is for you.*
-
 ## License
 
 MIT. See `LICENSE`.
@@ -79,3 +103,7 @@ MIT. See `LICENSE`.
 ## Contributions
 
 Contributions are welcome. Please keep changes generic, avoid project-specific fixtures, include tests for behavior changes, and document any scoring or anchor changes clearly. For anchor updates, include validation showing that the ordered Likert ladder still ranks negative, neutral, and positive reactions in the expected order.
+
+---
+
+Built by [Will Mitchell](https://willmitchell.com) at [House of Vibe](https://houseofvibe.ai/?utm_source=github&utm_medium=repo&utm_campaign=synthetic-panel).
