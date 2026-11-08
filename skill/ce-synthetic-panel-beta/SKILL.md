@@ -12,7 +12,7 @@ Use this skill when a member wants to compare marketing-copy variants against a 
 
 - Do not ask the member to hand-edit YAML or JSON. Interview them, then write the files yourself.
 - Do not request an API key. The default scoring path uses local embeddings.
-- Before the first scoring run, tell the member: `The first local scoring run downloads a sentence-transformers embedding model, about 1.5GB. It can take several minutes and may look quiet while it downloads.`
+- Before the first scoring run, tell the member: `The first local scoring run downloads a sentence-transformers embedding model. The default model download is about 88 MB; the size varies by model and what is already cached. This is separate from the package dependencies installed below. It can take several minutes and may look quiet while it downloads.`
 - Generate each sample as an independent in-context draw. Never produce all samples as one list in a single generation.
 - Preserve the third-person framing already present in every emitted prompt. Do not rewrite the prompt into first person.
 - Present rankings as relative comparisons. Label absolute 1-5 scores as directional.
@@ -20,13 +20,19 @@ Use this skill when a member wants to compare marketing-copy variants against a 
 
 ## One-Time Install
 
-If `synthetic-panel` is not available, install it from a pinned public source:
+If `synthetic-panel` is not available, install it from a pinned public source. On Linux, select the CPU backend to avoid downloading unneeded CUDA dependencies:
 
 ```bash
-uv tool install git+https://github.com/StartupBros/synthetic-panel@v0.1.0
+uv tool install --torch-backend cpu git+https://github.com/StartupBros-com/synthetic-panel@v0.1.0
 ```
 
-This is the member's only install step (one pinned, immutable release).
+On macOS and other platforms, use the default backend instead:
+
+```bash
+uv tool install git+https://github.com/StartupBros-com/synthetic-panel@v0.1.0
+```
+
+Run only the command for the member's platform. This is the member's only install step (one pinned release).
 
 ## Interview
 
