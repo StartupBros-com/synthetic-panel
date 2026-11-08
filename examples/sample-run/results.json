@@ -1,0 +1,240 @@
+{
+  "comparability": {
+    "issues": [],
+    "message": "Comparable directional ranking. Absolute scores are directional only.",
+    "verdict": "comparable"
+  },
+  "dist_temperature": 1.0,
+  "n_samples": 2,
+  "per_persona_variant": {
+    "outcome:alex": {
+      "distribution": [
+        0.1346829729806031,
+        0.24613143463205717,
+        0.20981479855375612,
+        0.10701172371824319,
+        0.30235907011534047
+      ],
+      "embedding_distance": 0.2121453897904254,
+      "persona_id": "alex",
+      "sample_scores": [
+        2.95342515120315,
+        3.4390398155081714
+      ],
+      "score": 3.1962324833556606,
+      "score_label": "directional",
+      "score_spread": 0.4856146643050212,
+      "variant_id": "outcome"
+    },
+    "outcome:jordan": {
+      "distribution": [
+        0.21065438921432122,
+        0.2500253268804527,
+        0.19235901874211858,
+        0.15341575861391699,
+        0.1935455065491906
+      ],
+      "embedding_distance": 0.1755848125397439,
+      "persona_id": "jordan",
+      "sample_scores": [
+        2.698896162604985,
+        3.0394491702014212
+      ],
+      "score": 2.869172666403203,
+      "score_label": "directional",
+      "score_spread": 0.34055300759643625,
+      "variant_id": "outcome"
+    },
+    "outcome:priya": {
+      "distribution": [
+        0.20226184244898165,
+        0.2678265601063134,
+        0.17551205313073365,
+        0.10547872801605498,
+        0.24892081629791635
+      ],
+      "embedding_distance": 0.1974835637204797,
+      "persona_id": "priya",
+      "sample_scores": [
+        3.157045604077269,
+        2.7048946271379526
+      ],
+      "score": 2.930970115607611,
+      "score_label": "directional",
+      "score_spread": 0.4521509769393166,
+      "variant_id": "outcome"
+    },
+    "plain:alex": {
+      "distribution": [
+        0.14783758459026392,
+        0.1876908222404714,
+        0.1426227245899446,
+        0.17110510662446138,
+        0.3507437619548587
+      ],
+      "embedding_distance": 0.17346653767622455,
+      "persona_id": "alex",
+      "sample_scores": [
+        3.309177962696272,
+        3.469275315530087
+      ],
+      "score": 3.3892266391131796,
+      "score_label": "directional",
+      "score_spread": 0.160097352833815,
+      "variant_id": "plain"
+    },
+    "plain:jordan": {
+      "distribution": [
+        0.23394844337852083,
+        0.14849274301514065,
+        0.20752473037214036,
+        0.2425723475978428,
+        0.16746173563635536
+      ],
+      "embedding_distance": 0.3839856187824525,
+      "persona_id": "jordan",
+      "sample_scores": [
+        2.8692959623089838,
+        3.052916415887758
+      ],
+      "score": 2.9611061890983708,
+      "score_label": "directional",
+      "score_spread": 0.18362045357877443,
+      "variant_id": "plain"
+    },
+    "plain:priya": {
+      "distribution": [
+        0.21797607117989298,
+        0.2602710414660284,
+        0.19044088666156123,
+        0.16175834110623782,
+        0.1695536595862796
+      ],
+      "embedding_distance": 0.22701170370211743,
+      "persona_id": "priya",
+      "sample_scores": [
+        2.5859563471406437,
+        3.023328605765322
+      ],
+      "score": 2.804642476452983,
+      "score_label": "directional",
+      "score_spread": 0.43737225862467843,
+      "variant_id": "plain"
+    },
+    "proof:alex": {
+      "distribution": [
+        0.15472579240071477,
+        0.128553550114361,
+        0.32112370621862696,
+        0.16079453117519898,
+        0.23480242009109828
+      ],
+      "embedding_distance": 0.15323661209865813,
+      "persona_id": "alex",
+      "sample_scores": [
+        3.0896154701907212,
+        3.295173002692489
+      ],
+      "score": 3.192394236441605,
+      "score_label": "directional",
+      "score_spread": 0.20555753250176778,
+      "variant_id": "proof"
+    },
+    "proof:jordan": {
+      "distribution": [
+        0.2994449587815413,
+        0.08003599185005694,
+        0.33341041387115833,
+        0.13134346629626117,
+        0.15576516920098227
+      ],
+      "embedding_distance": 0.1784905129217772,
+      "persona_id": "jordan",
+      "sample_scores": [
+        2.7424341240221985,
+        2.785461666547974
+      ],
+      "score": 2.763947895285086,
+      "score_label": "directional",
+      "score_spread": 0.04302754252577534,
+      "variant_id": "proof"
+    },
+    "proof:priya": {
+      "distribution": [
+        0.24909101606095024,
+        0.14568628520376956,
+        0.3476586184031816,
+        0.08967810075995522,
+        0.16788597957214346
+      ],
+      "embedding_distance": 0.11782345423831819,
+      "persona_id": "priya",
+      "sample_scores": [
+        2.8288217404868274,
+        2.734341744670317
+      ],
+      "score": 2.781581742578572,
+      "score_label": "directional",
+      "score_spread": 0.09447999581651034,
+      "variant_id": "proof"
+    }
+  },
+  "per_variant": {
+    "outcome": {
+      "copy": "Turn scattered customer requests into a prioritized product roadmap.",
+      "persona_scores": {
+        "alex": 3.1962324833556606,
+        "jordan": 2.869172666403203,
+        "priya": 2.930970115607611
+      },
+      "reasoning_excerpt": "Alex, a 34-year-old SaaS founder, reacts with immediate recognition. The headline names a problem he lives with: feature requests scattered across Intercom, Slack, sales calls and email, with no clear way to weigh them. \"Prioritized\" is what grabs him, because he's the one who ha",
+      "score": 2.998791755122158,
+      "score_label": "directional",
+      "variant_id": "outcome"
+    },
+    "plain": {
+      "copy": "Track customer requests in one place.",
+      "persona_scores": {
+        "alex": 3.3892266391131796,
+        "jordan": 2.9611061890983708,
+        "priya": 2.804642476452983
+      },
+      "reasoning_excerpt": "Alex, a 34-year-old SaaS founder in Austin, shrugs at the headline. It's clear, but it's also generic. Alex already juggles requests across Intercom, Slack, email and a Notion board, so \"one place\" names a real annoyance, but every feedback tool says the same thing. Alex wants to",
+      "score": 3.0516584348881772,
+      "score_label": "directional",
+      "variant_id": "plain"
+    },
+    "proof": {
+      "copy": "Prioritize customer requests with evidence your product team can trust.",
+      "persona_scores": {
+        "alex": 3.192394236441605,
+        "jordan": 2.763947895285086,
+        "priya": 2.781581742578572
+      },
+      "reasoning_excerpt": "Alex Chen, a 34-year-old SaaS founder, reads the headline and feels a flicker of recognition, then mild skepticism. Prioritizing customer requests is a real headache, since every loud customer or big deal claims to be the priority. \"Evidence your product team can trust\" hits that",
+      "score": 2.912641291435088,
+      "score_label": "directional",
+      "variant_id": "proof"
+    }
+  },
+  "ranking": [
+    {
+      "rank": 1,
+      "score": 3.0516584348881772,
+      "variant_id": "plain"
+    },
+    {
+      "rank": 2,
+      "score": 2.998791755122158,
+      "variant_id": "outcome"
+    },
+    {
+      "rank": 3,
+      "score": 2.912641291435088,
+      "variant_id": "proof"
+    }
+  ],
+  "schema_version": 1,
+  "score_scale": "1-5 directional",
+  "stimulus_type": "headline"
+}

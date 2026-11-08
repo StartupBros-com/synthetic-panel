@@ -23,13 +23,13 @@ Use this skill when a member wants to compare marketing-copy variants against a 
 If `synthetic-panel` is not available, install it from a pinned public source. On Linux, select the CPU backend to avoid downloading unneeded CUDA dependencies:
 
 ```bash
-uv tool install --torch-backend cpu git+https://github.com/StartupBros-com/synthetic-panel@v0.1.0
+uv tool install --torch-backend cpu git+https://github.com/StartupBros-com/synthetic-panel@v0.1.1
 ```
 
 On macOS and other platforms, use the default backend instead:
 
 ```bash
-uv tool install git+https://github.com/StartupBros-com/synthetic-panel@v0.1.0
+uv tool install git+https://github.com/StartupBros-com/synthetic-panel@v0.1.1
 ```
 
 Run only the command for the member's platform. This is the member's only install step (one pinned release).
