@@ -106,4 +106,4 @@ Contributions are welcome. Please keep changes generic, avoid project-specific f
 
 ---
 
-Built by [Will Mitchell](https://willmitchell.com) at [House of Vibe](https://houseofvibe.ai/?utm_source=github&utm_medium=repo&utm_campaign=synthetic-panel).
+Built by [Will Mitchell](https://github.com/StartupBros) at [House of Vibe](https://houseofvibe.ai).
