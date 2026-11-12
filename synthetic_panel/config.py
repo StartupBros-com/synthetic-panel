@@ -16,9 +16,7 @@ import hashlib
 import json
 import os
 import tempfile
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 __all__ = [
     "PersonaValidationError",

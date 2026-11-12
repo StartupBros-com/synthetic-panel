@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ideation: synthetic-panel, next directions after v1</title>
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface-2: #f0eee9;
+    --ink: #1e1c1a;
+    --ink-soft: #56514b;
+    --ink-faint: #857e75;
+    --line: #e2ded7;
+    --accent: #9a4b17;
+    --accent-soft: #f3e6da;
+    --accent-ink: #7c3a0f;
+    --good: #2f6b46;
+    --good-soft: #e2efe6;
+    --warn: #8a6d10;
+    --warn-soft: #f3ecd5;
+    --info: #2c5573;
+    --info-soft: #e0ebf2;
+    --radius: 10px;
+    --measure: 72ch;
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: "Iowan Old Style", "Palatino Linotype", ui-serif, Georgia, serif;
+    --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16140f;
+      --surface: #201d18;
+      --surface-2: #2a261f;
+      --ink: #ece7df;
+      --ink-soft: #c0b8ab;
+      --ink-faint: #928a7d;
+      --line: #38332b;
+      --accent: #e08a4c;
+      --accent-soft: #362717;
+      --accent-ink: #eda978;
+      --good: #7dc295;
+      --good-soft: #1c2c22;
+      --warn: #d8b64a;
+      --warn-soft: #2c2712;
+      --info: #86b4d6;
+      --info-soft: #172631;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--ui);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .page { max-width: 940px; margin-inline: auto; padding: 40px 24px 80px; }
+  p, li { max-width: var(--measure); }
+  a { color: var(--accent-ink); text-underline-offset: 2px; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: 5px;
+    border: 1px solid var(--line);
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-family: var(--sans);
+    font-size: 34px;
+    line-height: 1.15;
+    margin: 0 0 14px;
+    letter-spacing: -0.01em;
+  }
+  h2 {
+    font-family: var(--sans);
+    font-size: 24px;
+    margin: 52px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--line);
+    letter-spacing: -0.01em;
+  }
+  h3 { font-size: 18px; margin: 26px 0 8px; }
+  .lede { font-size: 18px; color: var(--ink-soft); max-width: var(--measure); }
+
+  .meta-strip {
+    display: flex; flex-wrap: wrap; gap: 8px 10px;
+    margin: 18px 0 8px; padding: 0; list-style: none;
+  }
+  .meta-strip li {
+    font-size: 13px; color: var(--ink-soft);
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 12px;
+  }
+  .meta-strip b { color: var(--ink); font-weight: 600; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin: 26px 0 8px;
+  }
+  .stats .stat {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 14px 16px;
+  }
+  .stats .num { font-size: 26px; font-weight: 700; font-family: var(--sans); }
+  .stats .lbl { font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; }
+  @media (max-width: 680px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  section { margin-top: 8px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin: 18px 0;
+  }
+  .grounding p:first-child, .card p:first-child { margin-top: 0; }
+
+  .axes { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .axes li {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 4px solid var(--accent); border-radius: var(--radius);
+    padding: 12px 16px;
+  }
+  .axes .axis-name { font-weight: 700; }
+
+  .jump { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; margin: 16px 0 22px; }
+  .jump ol { margin: 8px 0 0; padding-left: 22px; }
+  .jump li { margin: 3px 0; }
+  .jump a { text-decoration: none; }
+  .jump a:hover { text-decoration: underline; }
+
+  article.idea { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 24px; margin: 22px 0; }
+  article.idea > h3 { margin-top: 0; font-family: var(--sans); font-size: 21px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .idchip {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    background: var(--accent-soft); color: var(--accent-ink);
+    border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px;
+    white-space: nowrap;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 16px; }
+  .chip {
+    font-size: 12px; border-radius: 999px; padding: 3px 11px;
+    border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-soft);
+  }
+  .chip.axis { background: var(--info-soft); color: var(--info); }
+  .chip.conf { background: var(--good-soft); color: var(--good); }
+  .chip.cx { background: var(--warn-soft); color: var(--warn); }
+
+  .field { margin: 14px 0; }
+  .field .k { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); font-weight: 700; margin-bottom: 3px; }
+  .basis { border-radius: 8px; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--line); }
+  .basis .tag { font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 5px; margin-right: 6px; }
+  .basis .direct { background: var(--good-soft); color: var(--good); }
+  .basis .external { background: var(--info-soft); color: var(--info); }
+  .basis .reasoned { background: var(--warn-soft); color: var(--warn); }
+  .basis + .basis { margin-top: 8px; }
+
+  figure { margin: 18px 0; }
+  figure svg { max-width: 100%; height: auto; display: block; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+  figcaption { font-size: 13px; color: var(--ink-faint); margin-top: 6px; }
+  .svg-bg { fill: var(--surface); }
+  .svg-box { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.5; }
+  .svg-accent { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+  .svg-good { fill: var(--good-soft); stroke: var(--good); stroke-width: 1.5; }
+  .svg-info { fill: var(--info-soft); stroke: var(--info); stroke-width: 1.5; }
+  .svg-warn { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.5; }
+  .svg-t { font-family: var(--ui); font-size: 13px; fill: var(--ink); }
+  .svg-tm { font-family: var(--ui); font-size: 11px; fill: var(--ink-soft); }
+  .svg-halo { paint-order: stroke fill; stroke: var(--surface); stroke-width: 3px; }
+  .svg-stroke { stroke: var(--ink-soft); stroke-width: 1.5; fill: none; }
+
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); }
+  td.n { font-family: var(--mono); color: var(--ink-faint); white-space: nowrap; }
+
+  .refs { font-size: 14px; }
+  .refs li { margin: 5px 0; }
+
+  footer.composition-signal {
+    margin-top: 60px; padding-top: 16px; border-top: 1px solid var(--line);
+    font-size: 12px; color: var(--ink-faint);
+  }
+  footer.composition-signal code { font-size: 11px; }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <p class="eyebrow">Ideation &middot; Compound Engineering</p>
+  <h1>synthetic-panel: the strongest directions after v1</h1>
+  <p class="lede">v1 shipped a zero-key, MIT-licensed synthetic customer panel that ranks copy variants with a local SSR scoring instrument. This refresh looks at what to build next, grounded in the shipped code and the mid-2026 market it now sits in.</p>
+
+  <ul class="meta-strip">
+    <li><b>Date</b> 2026-07-11</li>
+    <li><b>Topic</b> synthetic-panel-next-directions</li>
+    <li><b>Focus</b> refresh of the original open-source ideation, post-v1</li>
+    <li><b>Mode</b> repo-grounded</li>
+  </ul>
+
+  <div class="stats">
+    <div class="stat"><div class="num">8</div><div class="lbl">ranked ideas</div></div>
+    <div class="stat"><div class="num">17</div><div class="lbl">considered</div></div>
+    <div class="stat"><div class="num">5</div><div class="lbl">topic axes</div></div>
+    <div class="stat"><div class="num">v1</div><div class="lbl">shipped 2026-06</div></div>
+  </div>
+
+  <h2 id="grounding">Codebase Context</h2>
+  <section class="grounding card">
+    <p><b>The arc.</b> synthetic-panel began inside StartupBros as an internal SSR tester (the old <code>analytics/synthetic/</code> batch tooling), then was extracted and open-sourced in June 2026 as a generic, MIT, zero-API-key tool. v1 is deliberately narrow: two CLI subcommands, <code>emit-prompts</code> and <code>score-reactions</code>. The caller's own AI agent generates the persona reactions (wired through the <code>ce-synthetic-panel-beta</code> skill); the package owns only the deterministic prompt handoff and the local scoring. It is positioned for <b>relative ranking</b> ("which variant resonates more"), with absolute 1-5 scores labeled <code>directional</code>.</p>
+
+    <p><b>How the instrument works.</b> Each reaction is embedded (local <code>all-MiniLM-L6-v2</code> by default) and compared by cosine similarity to ordered Likert anchor statements, following Semantic Similarity Rating (arXiv:2510.08338): subtract the minimum similarity, normalize to a distribution, apply a power-law temperature, average across anchor sets, then take a weighted 1-5 score. A comparability guard flags near-duplicate samples so a collapsed run is not trusted.</p>
+
+    <p><b>Notable state and leverage points (from the shipped code).</b></p>
+    <ul>
+      <li>The ranking sorts on point scores alone; the full per-sample distributions are computed and then discarded for ranking, and comparability is an all-or-nothing verdict driven by any single issue.</li>
+      <li>Per-variant scores are averaged across personas into one number, so segment disagreement (a founder loves it, a learner shrugs) is invisible in the headline.</li>
+      <li>The comparability guard only catches near-duplicate samples; it does not flag sycophantic, generic, or caricatured reactions.</li>
+      <li>The default anchor file ships three sets while the scoring docstring describes six, and one intent-to-act ladder is reused for all six stimulus types (headline, email subject, offer, value prop, CTA, price).</li>
+      <li>A large body of API-only machinery (synchronous, async, and Anthropic batch test runners, plus a <code>CalibrationStore</code>) is unreachable from the two-subcommand CLI and depends on a <code>calibration</code> module that does not ship, so it is inert in v1.</li>
+    </ul>
+
+    <p><b>External context (mid-2026 landscape).</b> The synthetic-research category is crowded and richly funded (one competitor-authored 2026 market map tallies over $1.5B in venture capital), but every notable player (Synthetic Users, Aaru, Simile, Yabble/YouGov, Qualtrics Edge, Artificial Societies) is closed-source SaaS priced per seat or per interview, and most now advertise <i>absolute</i> calibration accuracy of 85 to 95 percent. That is precisely the claim the research literature disputes: Bisbee et al. (2024) show synthetic panels narrow variance while inflating point estimates, Sarstedt et al. (2024) find only about a quarter of 285 silicon-versus-human comparisons "similar," and Samoylov (2024) showed reworded prompts swinging a persona's mean income from $111k to $272k. The SSR paper itself validates that the method recovers the <i>relative ranking</i> of concepts, which is exactly the narrow claim v1 makes. No open, vendor-neutral tool or leaderboard turned up in this refresh's search; open benchmarks that could anchor validation now exist (Twin-2K-500, the A/B-holdout SimGym, ANES/WVS backtesting). On the instrument itself, <code>all-MiniLM-L6-v2</code> carries a known training-data commercial gray area, and clean MIT/Apache successors (BGE-M3, Qwen3-Embedding-0.6B) are now laptop-runnable. Demand from indie builders and CRO practitioners is real but bounded: they want a cheap, honest pre-filter, and their loudest complaint is exactly the overconfidence a relative-ranking tool is built to avoid.</p>
+    <p style="color:var(--ink-faint);font-size:13px;">Several landscape sources were reached through search snippets and secondary citations rather than direct fetches, and vendor accuracy figures are self-reported. External bases below name their source so each can be spot-checked before it is leaned on.</p>
+  </section>
+
+  <h2 id="axes">Topic Axes</h2>
+  <ul class="axes">
+    <li><span class="axis-name">Calibration and trust:</span> turning directional scores into a signal a user can act on: uncertainty, significance, and validation against real outcomes.</li>
+    <li><span class="axis-name">Scoring instrument:</span> the SSR anchors, the embedding model, the distribution math, the comparability logic.</li>
+    <li><span class="axis-name">Generation seam:</span> how reactions are produced and how independent and realistic they are, plus the zero-key handoff and the dead API paths behind it.</li>
+    <li><span class="axis-name">Persona realism:</span> the persona schema, its depth and provenance, and the segment structure the panel represents.</li>
+    <li><span class="axis-name">Adoption and distribution:</span> install friction, who can run it without an agent, and where it fits into a recurring workflow.</li>
+  </ul>
+
+  <h2 id="ideas">Ranked Ideas</h2>
+  <div class="jump">
+    <b>Jump to an idea</b>
+    <ol>
+      <li><a href="#i1">Uncertainty-aware ranking: report the tie, not just the winner</a></li>
+      <li><a href="#i2">Segment-disagreement view: where the personas split</a></li>
+      <li><a href="#i3">Stimulus-aware anchor sets (and finish the six)</a></li>
+      <li><a href="#i4">A validation harness that measures the panel against real outcomes</a></li>
+      <li><a href="#i5">Persona provenance: ground the panel in real evidence</a></li>
+      <li><a href="#i6">A reaction-quality gate for sycophancy and mode collapse</a></li>
+      <li><a href="#i7">"Why it ranked": copy attribution by ablation</a></li>
+      <li><a href="#i8">One-command <code>run</code>: an optional local generator, and honest cleanup</a></li>
+    </ol>
+  </div>
+
+  <!-- IDEA 1 -->
+  <article class="idea" id="i1">
+    <h3><span class="idchip">I-1</span> Uncertainty-aware ranking: report the tie, not just the winner</h3>
+    <div class="chips">
+      <span class="chip axis">Calibration and trust</span>
+      <span class="chip conf">Confidence 85%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+
+    <p>The tool already computes a full 1-5 probability distribution for every sample and every variant, then throws that richness away: the ranking sorts purely on the point score, so two variants at 3.81 and 3.79 are presented as first and second place when the gap is noise. Add an uncertainty layer on top of the numbers the instrument already produces. Use the per-sample spread and distribution overlap to label each pairwise comparison as a <b>clear difference</b>, a <b>lean</b>, or a <b>statistical tie</b>, and give the user a "you would need N more samples to separate these" hint. In the same pass, replace the all-or-nothing comparability verdict with a graded one that scopes trust to the clean persona-variant cells instead of failing the whole run on one issue.</p>
+
+    <figure>
+      <svg viewBox="0 0 640 210" role="img" aria-label="Two variant score distributions that overlap heavily are a tie; two that separate are a clear winner.">
+        <rect class="svg-bg" x="0" y="0" width="640" height="210" rx="10"/>
+        <!-- left panel: tie -->
+        <text class="svg-t svg-halo" x="20" y="28" font-weight="700">Overlapping: call it a tie</text>
+        <line class="svg-stroke" x1="30" y1="150" x2="300" y2="150"/>
+        <path class="svg-accent" d="M40,150 C90,60 150,60 165,150 Z" opacity="0.75"/>
+        <path class="svg-good" d="M120,150 C170,50 230,50 250,150 Z" opacity="0.6"/>
+        <text class="svg-tm" x="100" y="168">A 3.79</text>
+        <text class="svg-tm" x="205" y="168">B 3.81</text>
+        <text class="svg-tm svg-halo" x="150" y="105">wide overlap</text>
+        <!-- right panel: clear -->
+        <text class="svg-t svg-halo" x="350" y="28" font-weight="700">Separated: clear winner</text>
+        <line class="svg-stroke" x1="345" y1="150" x2="620" y2="150"/>
+        <path class="svg-accent" d="M355,150 C385,80 425,80 445,150 Z" opacity="0.75"/>
+        <path class="svg-good" d="M520,150 C550,55 590,55 610,150 Z" opacity="0.7"/>
+        <text class="svg-tm" x="385" y="168">A 2.9</text>
+        <text class="svg-tm" x="555" y="168">B 4.2</text>
+        <text class="svg-tm svg-halo" x="470" y="120">gap &gt; noise</text>
+      </svg>
+      <figcaption>Illustrative: the same point-score gap means different things depending on how much the distributions overlap. The tool has the distributions; it just does not use them for the verdict yet.</figcaption>
+    </figure>
+
+    <div class="field">
+      <div class="k">Basis</div>
+      <div class="basis"><span class="tag direct">direct</span> The ranking is built by sorting per-variant point scores only (<code>testing.py</code>, the <code>ranking</code> comprehension), while the averaged distribution is computed alongside and left unused for the verdict; comparability is <code>"not_comparable" if issues else "comparable"</code>, so one missing sample condemns the whole run.</div>
+      <div class="basis"><span class="tag external">external</span> The category's central credibility problem is overstated confidence: Bisbee et al. (Political Analysis, 2024) show synthetic panels narrow variance, and Samoylov (Conjointly, 2024) shows outputs swinging wildly with prompt wording. A tool that openly reports "this is a tie" is the direct antidote and matches its own relative-ranking promise.</div>
+    </div>
+    <div class="field"><div class="k">Rationale</div><p>The product's one-line promise is "which variant resonates more." Right now it answers that question even when it should not. Distinguishing a real difference from sampling noise is the single change that most raises trust, and it is the feature every closed competitor avoids because it undercuts their absolute-accuracy marketing. It costs almost nothing in new machinery because the distributions already exist.</p></div>
+    <div class="field"><div class="k">Downsides</div><p>Bootstrap or overlap statistics on n=2 samples are themselves shaky; the honest version nudges users toward more samples, which costs them generation time. Presenting ties can feel less satisfying than a clean leaderboard.</p></div>
+  </article>
+
+  <!-- IDEA 2 -->
+  <article class="idea" id="i2">
+    <h3><span class="idchip">I-2</span> Segment-disagreement view: where the personas split</h3>
+    <div class="chips">
+      <span class="chip axis">Persona realism</span>
+      <span class="chip conf">Confidence 88%</span>
+      <span class="chip cx">Complexity Low</span>
+    </div>
+
+    <p>Scores are computed per persona-variant, then averaged into one number per variant before ranking. That average is where the most actionable signal disappears: the interesting result is rarely "variant C wins overall," it is "variant C wins decisively with founders and actively loses with first-time learners." Surface a compact persona-by-variant matrix and call out the disagreements explicitly: the variant with the highest floor, the one with the widest spread, and any variant that flips rank between segments. The per-persona data is already retained; this is a presentation and small-analysis change, not new scoring.</p>
+
+    <figure>
+      <svg viewBox="0 0 620 200" role="img" aria-label="A persona by variant matrix showing that the overall winner is not the winner for every segment.">
+        <rect class="svg-bg" x="0" y="0" width="620" height="200" rx="10"/>
+        <text class="svg-tm" x="150" y="30">Variant A</text>
+        <text class="svg-tm" x="270" y="30">Variant B</text>
+        <text class="svg-tm" x="390" y="30">Variant C</text>
+        <text class="svg-tm" x="500" y="30" font-weight="700">Avg</text>
+        <!-- rows -->
+        <g>
+          <text class="svg-t" x="20" y="66">Founder</text>
+          <rect class="svg-box" x="140" y="48" width="80" height="26" rx="5"/><text class="svg-tm" x="168" y="66">3.1</text>
+          <rect class="svg-box" x="260" y="48" width="80" height="26" rx="5"/><text class="svg-tm" x="288" y="66">3.4</text>
+          <rect class="svg-good" x="380" y="48" width="80" height="26" rx="5"/><text class="svg-tm" x="404" y="66">4.4</text>
+          <text class="svg-tm" x="500" y="66">3.6</text>
+        </g>
+        <g>
+          <text class="svg-t" x="20" y="106">Learner</text>
+          <rect class="svg-good" x="140" y="88" width="80" height="26" rx="5"/><text class="svg-tm" x="168" y="106">4.0</text>
+          <rect class="svg-box" x="260" y="88" width="80" height="26" rx="5"/><text class="svg-tm" x="288" y="106">3.5</text>
+          <rect class="svg-warn" x="380" y="88" width="80" height="26" rx="5"/><text class="svg-tm" x="404" y="106">2.6</text>
+          <text class="svg-tm" x="500" y="106">3.4</text>
+        </g>
+        <g>
+          <text class="svg-t" x="20" y="146">Buyer</text>
+          <rect class="svg-box" x="140" y="128" width="80" height="26" rx="5"/><text class="svg-tm" x="168" y="146">3.3</text>
+          <rect class="svg-box" x="260" y="128" width="80" height="26" rx="5"/><text class="svg-tm" x="288" y="146">3.6</text>
+          <rect class="svg-box" x="380" y="128" width="80" height="26" rx="5"/><text class="svg-tm" x="404" y="146">3.5</text>
+          <text class="svg-tm" x="500" y="146">3.5</text>
+        </g>
+        <text class="svg-tm svg-halo" x="140" y="182" fill="#8a6d10">C has the highest average but the lowest floor: it splits the room.</text>
+      </svg>
+      <figcaption>Illustrative: the flat average ranks C first, but C is a segment gamble, not a safe winner. The matrix makes that legible.</figcaption>
+    </figure>
+
+    <div class="field">
+      <div class="k">Basis</div>
+      <div class="basis"><span class="tag direct">direct</span> Per-variant scoring averages the persona scores (<code>testing.py</code>, the per-variant aggregation divides the summed group scores by the group count) even though <code>per_persona_variant</code> retains every cell; the headline ranking never exposes it.</div>
+    </div>
+    <div class="field"><div class="k">Rationale</div><p>Marketers do not ship copy to an "average" persona; they choose who to win and who to sacrifice. Disagreement is the decision-grade output, and it turns a one-number answer into a segmentation insight that no averaged leaderboard can give. It is close to free given the retained data.</p></div>
+    <div class="field"><div class="k">Downsides</div><p>With few personas the matrix is thin and can imply more precision than n=2 samples support; it pairs best with I-1 so cells are labeled by confidence. More surface area to render in a CLI-first tool.</p></div>
+  </article>
+
+  <!-- IDEA 3 -->
+  <article class="idea" id="i3">
+    <h3><span class="idchip">I-3</span> Stimulus-aware anchor sets (and finish the six)</h3>
+    <div class="chips">
+      <span class="chip axis">Scoring instrument</span>
+      <span class="chip conf">Confidence 80%</span>
+      <span class="chip cx">Complexity Low</span>
+    </div>
+
+    <p>The instrument measures one latent dimension, intent to act ("I would take the next step"), and applies that single ladder to all six stimulus types. But a price test is not an intent test: the useful axis for pricing is "feels fair versus feels expensive," for a headline it is "clear versus confusing," for a value prop it is "relevant versus generic." Ship stimulus-appropriate anchor ladders so the score measures the thing that actually matters for each format. In the same pass, reconcile the default anchor data with the method: the file ships three sets while the SSR docstring calls for six, and the paper's variance reduction depends on that averaging.</p>
+
+    <div class="field">
+      <div class="k">Basis</div>
+      <div class="basis"><span class="tag direct">direct</span> <code>anchors.default.yaml</code> contains <code>set_1</code> through <code>set_3</code>, all phrased as intent to act, while <code>scoring.py</code> documents "averaging across 6 distinct reference statement sets"; <code>get_stimulus_prompt</code> in <code>config.py</code> defines six distinct stimulus types that all score against the one ladder.</div>
+      <div class="basis"><span class="tag external">external</span> The SSR paper (arXiv:2510.08338) frames the anchors as the elicited construct, and its validity is conditional on measuring the right latent scale; using an intent ladder to score a fairness question is a construct mismatch the method itself warns against.</div>
+    </div>
+    <div class="field"><div class="k">Rationale</div><p>This is the cheapest way to make the scores more valid rather than just more numerous. Anchor sets are data, not code, so it invites contribution and keeps the instrument inspectable, which is the open project's core differentiator against closed panels.</p></div>
+    <div class="field"><div class="k">Downsides</div><p>Divergent per-type ladders make cross-format comparisons less meaningful (arguably correct, but a behavior change). More anchor sets to author and validate against the "negative below neutral below positive" ordering test the repo already enforces.</p></div>
+  </article>
+
+  <!-- IDEA 4 -->
+  <article class="idea" id="i4">
+    <h3><span class="idchip">I-4</span> A validation harness that measures the panel against real outcomes</h3>
+    <div class="chips">
+      <span class="chip axis">Calibration and trust</span>
+      <span class="chip conf">Confidence 70%</span>
+      <span class="chip cx">Complexity High</span>
+    </div>
+
+    <p>The README calls calibration "planned future work," and the codebase already gestures at it: prediction tracking and a <code>CalibrationStore</code> are scaffolded but inert because the module never ships. Make the loop real and honest. Ship a small labeled benchmark (a set of copy variants with a known preference order from real A/B results or human ratings) and a <code>validate</code> command that reports how well the panel's ranking reproduces the known order (rank correlation), not an absolute accuracy claim. Then make it a flywheel: let users opt in to attach their own real outcomes to stored predictions, so the tool accumulates evidence about when its rankings hold and when they do not.</p>
+
+    <figure>
+      <svg viewBox="0 0 620 170" role="img" aria-label="A loop: known-ranked cases feed the panel, whose predicted ranking is compared to the known order to produce a rank-correlation score.">
+        <rect class="svg-bg" x="0" y="0" width="620" height="170" rx="10"/>
+        <rect class="svg-info" x="24" y="60" width="150" height="52" rx="8"/>
+        <text class="svg-t svg-halo" x="42" y="82">Labeled cases</text>
+        <text class="svg-tm svg-halo" x="42" y="100">known winner</text>
+        <rect class="svg-accent" x="235" y="60" width="150" height="52" rx="8"/>
+        <text class="svg-t svg-halo" x="258" y="82">Panel ranks</text>
+        <text class="svg-tm svg-halo" x="258" y="100">predicted order</text>
+        <rect class="svg-good" x="446" y="60" width="150" height="52" rx="8"/>
+        <text class="svg-t svg-halo" x="464" y="82">Agreement</text>
+        <text class="svg-tm svg-halo" x="464" y="100">rank correlation</text>
+        <path class="svg-stroke" d="M174,86 L233,86" marker-end="url(#ah)"/>
+        <path class="svg-stroke" d="M385,86 L444,86" marker-end="url(#ah)"/>
+        <path class="svg-stroke" d="M521,112 C521,150 200,150 99,150 L99,114" marker-end="url(#ah)"/>
+        <text class="svg-tm svg-halo" x="250" y="146">opt-in real outcomes feed back new labeled cases</text>
+        <defs><marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="var(--ink-soft)"/></marker></defs>
+      </svg>
+      <figcaption>Illustrative: validation is a rank-agreement measurement, not an absolute-truth claim. Opt-in outcomes turn it into a compounding benchmark.</figcaption>
+    </figure>
+
+    <div class="field">
+      <div class="k">Basis</div>
+      <div class="basis"><span class="tag direct">direct</span> <code>track_predictions</code> and <code>get_cached_result</code> both do <code>from calibration import CalibrationStore</code> inside <code>try/except ImportError</code> (<code>testing.py</code>, <code>config.py</code>), and no <code>calibration</code> module ships, so the calibration path is dead. The README lists benchmarking as future work.</div>
+      <div class="basis"><span class="tag external">external</span> Vendor-neutral public harnesses now exist to model this on: Twin-2K-500 (arXiv:2505.17479) and the A/B-holdout SimGym (2026); ANES/WVS backtesting is the standard academic method. No open leaderboard for "does this panel predict real preferences" surfaced in this search, which points to open whitespace an OSS tool is well placed to claim.</div>
+    </div>
+    <div class="field"><div class="k">Rationale</div><p>This is the idea that converts the project's honesty from a disclaimer into a measurement. "We only claim relative ranking, and here is the harness that shows how well our rankings hold" is a stronger and more defensible position than the 85 to 95 percent absolute-accuracy claims competitors make without publishing their math. It also gives the inert scaffolding a real purpose or a clean removal.</p></div>
+    <div class="field"><div class="k">Downsides</div><p>The hard part is data: a credible benchmark needs real labeled outcomes, which are scarce and often proprietary; a weak benchmark is worse than none. Opt-in outcome collection raises privacy and incentive questions and must never become silent telemetry.</p></div>
+  </article>
+
+  <!-- IDEA 5 -->
+  <article class="idea" id="i5">
+    <h3><span class="idchip">I-5</span> Persona provenance: ground the panel in real evidence</h3>
+    <div class="chips">
+      <span class="chip axis">Persona realism</span>
+      <span class="chip conf">Confidence 72%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+
+    <p>Every score the panel produces inherits the realism of the personas behind it, and today those personas are invented. The shipped examples are demographics only, and even the richer schema is a fixed list of asserted traits (motivations, fears, messaging triggers) with no record of where any of them came from. That is exactly the input the silicon-sampling critiques blame for caricature. Let personas carry provenance instead: seed traits from real evidence the user already has (a handful of customer reviews, support tickets, sales-call notes, survey verbatims), and record, per trait, which snippet it came from. The panel then reasons from grounded, auditable personas, and a reviewer can see why a persona holds a belief rather than taking it on faith.</p>
+
+    <figure>
+      <svg viewBox="0 0 620 190" role="img" aria-label="Left: an invented persona whose traits have no source. Right: the same traits, each linked to a real evidence snippet.">
+        <rect class="svg-bg" x="0" y="0" width="620" height="190" rx="10"/>
+        <rect class="svg-warn" x="24" y="44" width="220" height="120" rx="8"/>
+        <text class="svg-t svg-halo" x="40" y="68" font-weight="700">Persona (asserted)</text>
+        <text class="svg-tm svg-halo" x="40" y="94">fears churn</text><text class="svg-tm svg-halo" x="172" y="94">source: ?</text>
+        <text class="svg-tm svg-halo" x="40" y="116">wants proof</text><text class="svg-tm svg-halo" x="172" y="116">source: ?</text>
+        <text class="svg-tm svg-halo" x="40" y="138">low patience</text><text class="svg-tm svg-halo" x="172" y="138">source: ?</text>
+        <path class="svg-stroke" d="M250,104 L358,104" marker-end="url(#ah3)"/>
+        <text class="svg-tm svg-halo" x="262" y="96">attach evidence</text>
+        <rect class="svg-good" x="366" y="44" width="230" height="120" rx="8"/>
+        <text class="svg-t svg-halo" x="382" y="68" font-weight="700">Persona (grounded)</text>
+        <text class="svg-tm svg-halo" x="382" y="94">fears churn</text><text class="svg-tm svg-halo" x="502" y="94">review #12</text>
+        <text class="svg-tm svg-halo" x="382" y="116">wants proof</text><text class="svg-tm svg-halo" x="502" y="116">ticket #48</text>
+        <text class="svg-tm svg-halo" x="382" y="138">low patience</text><text class="svg-tm svg-halo" x="502" y="138">call note 3</text>
+        <defs><marker id="ah3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="var(--ink-soft)"/></marker></defs>
+      </svg>
+      <figcaption>Illustrative: the same traits, made auditable. Provenance turns "the persona believes X" into "the persona believes X because a real customer said so."</figcaption>
+    </figure>
+
+    <div class="field">
+      <div class="k">Basis</div>
+      <div class="basis"><span class="tag direct">direct</span> The shipped personas are demographics only (<code>personas.example.yaml</code>: name, age, location, family, occupation, income), and the rich schema (<code>config.py</code> required fields for motivations, psychology, fears, messaging triggers) is a fixed set of asserted fields with no provenance; <code>build_persona_prompt</code> injects them into the prompt verbatim as fact.</div>
+      <div class="basis"><span class="tag external">external</span> Interview- and data-grounded personas outperform demographic-only prompting on fidelity (Twin-2K-500, arXiv:2505.17479, reaches roughly 72 to 88 percent of the human test-retest ceiling), while the central critique of synthetic panels (Bisbee et al. 2024, plus the mode-collapse literature) is that ungrounded persona conditioning yields caricature and narrowed variance. Grounding is the lever that most moves realism.</div>
+    </div>
+    <div class="field"><div class="k">Rationale</div><p>Grounding personas in the user's own evidence is the highest-leverage way to make reactions less generic and less sycophantic at the source, upstream of I-6's post-hoc quality gate. It also plays to the open tool's strength: the evidence stays local and inspectable, so realism becomes something a user can audit rather than a claim they have to trust.</p></div>
+    <div class="field"><div class="k">Downsides</div><p>Users may not have clean evidence to hand, and garbage in still applies; grounding raises the setup burden the zero-friction path tries to minimize, so it pairs with I-8's easier run. Provenance tracking adds schema and interface surface, and pasted evidence can carry personal data that must never leave the user's machine.</p></div>
+  </article>
+
+  <!-- IDEA 6 -->
+  <article class="idea" id="i6">
+    <h3><span class="idchip">I-6</span> A reaction-quality gate for sycophancy and mode collapse</h3>
+    <div class="chips">
+      <span class="chip axis">Generation seam</span>
+      <span class="chip conf">Confidence 72%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+
+    <p>The panel embeds whatever reaction text the agent produced and treats it as ground truth. The one guard that exists only catches near-duplicate samples after the fact; it says nothing about the failure mode the whole field complains about, which is sycophantic, generic, or caricatured reactions that inflate every score toward the top of the scale. Add a pre-scoring quality gate: flag reactions that are too short on specifics, that echo the stimulus wording, that cluster suspiciously close to a "generic positive" reference, or that are near-identical across genuinely different variants. Surface these as warnings that scope trust, in the same spirit as the existing comparability verdict.</p>
+
+    <div class="field">
+      <div class="k">Basis</div>
+      <div class="basis"><span class="tag direct">direct</span> The collapse detector compares samples on <code>score_spread</code> and <code>embedding_distance</code> floors (<code>testing.py</code>) to catch duplicates only; there is no check that a reaction is specific, non-sycophantic, or discriminating between variants before it is scored.</div>
+      <div class="basis"><span class="tag external">external</span> This is the most consistent complaint in the field: NN/g finds synthetic users skew "sycophantic," indie builders report pure-LLM feedback "tends to be a bit overoptimistic," and the mode-collapse literature (Paglieri et al.) shows even explicit diversity prompts collapse to a stereotype. Practitioners already hand-build "skeptical researcher" personas to fight this.</div>
+    </div>
+    <div class="field"><div class="k">Rationale</div><p>Cheap positivity is the exact way a synthetic panel silently lies. A gate that flags it, before the numbers are computed, protects the credibility of every downstream score and directly targets the objection reviewers and skeptics raise first.</p></div>
+    <div class="field"><div class="k">Downsides</div><p>Heuristics for "sycophantic" are fuzzy and risk false positives that annoy users; a too-aggressive gate could reject legitimately enthusiastic reactions. Some of this belongs upstream in the generation prompt, not only as a post-hoc filter.</p></div>
+  </article>
+
+  <!-- IDEA 7 -->
+  <article class="idea" id="i7">
+    <h3><span class="idchip">I-7</span> "Why it ranked": copy attribution by ablation</h3>
+    <div class="chips">
+      <span class="chip axis">Scoring instrument</span>
+      <span class="chip conf">Confidence 60%</span>
+      <span class="chip cx">Complexity Medium-High</span>
+    </div>
+
+    <p>A ranking tells a user which variant won; it does not tell them what to change. Attribution closes that gap: take a variant, make targeted edits (drop the proof clause, swap the urgency phrase), run each edited version back through the panel, and read off which change moved the resonance score. The output becomes a copy edit, not just a number: "the proof clause is carrying this headline; the urgency phrase is doing nothing." One honest caveat drives the whole design: the panel scores the persona's <i>reaction</i>, not the copy directly, so an edited variant needs a freshly generated reaction, which is an agent round-trip, not a free local operation. That means attribution is a <b>targeted sweep of a few candidate edits</b>, run through the pipeline the tool already has, not an exhaustive word-by-word ablation.</p>
+
+    <div class="field">
+      <div class="k">Basis</div>
+      <div class="basis"><span class="tag direct">direct</span> The seam already supports this shape: <code>emit-prompts</code> takes a variants file and <code>score-reactions</code> is a pure function of reaction text with cached local embeddings, so ablated copy is just additional variants through the existing emit, generate, score loop. The local scoring half is effectively free; only the generate step per edit has real cost.</div>
+      <div class="basis"><span class="tag reasoned">reasoned</span> Attribution by ablation is a standard, well-understood technique; the novelty is applying it to turn a resonance score into an editable copy diff, which is the actionable artifact marketers actually want. Because each edit costs one generation round-trip, a handful of hypothesis-driven edits (not a full ablation grid) is the affordable and useful version.</div>
+    </div>
+    <div class="field"><div class="k">Rationale</div><p>It moves the product up the value chain from "score my copy" to "improve my copy," a far stickier promise and a natural differentiator no closed leaderboard offers. It compounds with I-1 and I-3 because an attribution is only trustworthy once ties are detected and the anchors measure the right construct.</p></div>
+    <div class="field"><div class="k">Downsides</div><p>Each ablation needs a regenerated reaction, so cost scales with the number of edits and this is agent work, not just local scoring; an exhaustive ablation grid is out of reach. Attribution to a specific clause can imply more precision than a noisy, small-sample instrument supports, so it must be framed as directional, and it is only as good as the generation faithfully reflecting the edit.</p></div>
+  </article>
+
+  <!-- IDEA 8 -->
+  <article class="idea" id="i8">
+    <h3><span class="idchip">I-8</span> One-command <code>run</code>: an optional local generator, and honest cleanup</h3>
+    <div class="chips">
+      <span class="chip axis">Adoption and distribution</span>
+      <span class="chip conf">Confidence 75%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+
+    <p>v1 deliberately delegated generation to the caller's agent, which is right for the skill workflow but leaves two problems. First, a user without an agent harness cannot run the loop end to end: they must hand-shuttle a <code>reactions.json</code> between <code>emit-prompts</code> and <code>score-reactions</code>. Second, a large body of API-only run machinery (sync, async, and Anthropic batch runners, plus the calibration store) sits in the tree but is unreachable and non-functional. Resolve both together: add an optional local generation provider (Ollama or llama.cpp) so <code>synthetic-panel run</code> can do emit, generate, and score in one call for the zero-agent user, and in doing so either wire or delete the dead API paths so the codebase honestly reflects what it does.</p>
+
+    <figure>
+      <svg viewBox="0 0 620 210" role="img" aria-label="Before: emit then a manual JSON handoff then score. After: one run command wraps emit, optional local generation, and score.">
+        <rect class="svg-bg" x="0" y="0" width="620" height="210" rx="10"/>
+        <text class="svg-tm" x="20" y="34" font-weight="700">Today</text>
+        <rect class="svg-box" x="20" y="44" width="120" height="40" rx="6"/><text class="svg-tm" x="42" y="68">emit-prompts</text>
+        <rect class="svg-warn" x="180" y="44" width="150" height="40" rx="6"/><text class="svg-tm svg-halo" x="196" y="62">hand-edit</text><text class="svg-tm svg-halo" x="196" y="78">reactions.json</text>
+        <rect class="svg-box" x="370" y="44" width="140" height="40" rx="6"/><text class="svg-tm" x="392" y="68">score-reactions</text>
+        <path class="svg-stroke" d="M140,64 L178,64" marker-end="url(#ah2)"/>
+        <path class="svg-stroke" d="M330,64 L368,64" marker-end="url(#ah2)"/>
+
+        <text class="svg-tm" x="20" y="132" font-weight="700">Proposed</text>
+        <rect class="svg-accent" x="20" y="142" width="580" height="48" rx="8"/>
+        <text class="svg-t svg-halo" x="40" y="171">synthetic-panel run</text>
+        <rect class="svg-box" x="220" y="150" width="110" height="32" rx="6"/><text class="svg-tm" x="240" y="170">emit</text>
+        <rect class="svg-good" x="345" y="150" width="130" height="32" rx="6"/><text class="svg-tm" x="356" y="170">local gen*</text>
+        <rect class="svg-box" x="490" y="150" width="95" height="32" rx="6"/><text class="svg-tm" x="505" y="170">score</text>
+        <text class="svg-tm svg-halo" x="345" y="200">* optional; agent path still supported</text>
+        <defs><marker id="ah2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="var(--ink-soft)"/></marker></defs>
+      </svg>
+      <figcaption>Illustrative: the agent handoff stays as a first-class path; an optional local generator closes the loop for users who do not have one, and forces the dead runners to be resolved.</figcaption>
+    </figure>
+
+    <div class="field">
+      <div class="k">Basis</div>
+      <div class="basis"><span class="tag direct">direct</span> The CLI wires only <code>emit-prompts</code> and <code>score-reactions</code> (<code>cli.py</code> subparsers); <code>run_test</code>, <code>run_test_async</code>, and <code>run_test_batch</code> call <code>get_llm_client</code>, which raises <code>NotImplementedError("generation is provided by the skill in v1")</code> (<code>testing.py</code>), and the batch path plus the calibration store are unreachable and non-shipping.</div>
+      <div class="basis"><span class="tag external">external</span> No comparable zero-API-key, local-scoring OSS tool surfaced on GitHub in this search (the adjacent projects are persona datasets, not scorers), and indie builders repeatedly ask for a cheap, self-contained pre-filter. A one-command local run removes the last dependency between the tool and a non-agent user.</div>
+    </div>
+    <div class="field"><div class="k">Rationale</div><p>Zero-key is the headline promise; zero-agent would make it true for everyone, not just Claude Code users, which widens adoption sharply. Whichever way the generation question is answered, the dead code has to be resolved: shipping runners that cannot run erodes trust in an open codebase whose whole pitch is inspectability.</p></div>
+    <div class="field"><div class="k">Downsides</div><p>Bundling or depending on a local generator reintroduces a heavy model download and quality variance the zero-key scoring path deliberately avoided; small local models may generate weak reactions that make the panel look bad. Pruning has to be careful not to remove a path someone downstream relies on. This is the largest and most opinionated bet in the set.</p></div>
+  </article>
+
+  <h2 id="rejected">Rejection Summary</h2>
+  <table>
+    <thead><tr><th class="n">#</th><th>Idea considered</th><th>Reason not carried forward</th></tr></thead>
+    <tbody>
+      <tr><td class="n">R1</td><td>Precompute and cache static anchor embeddings for speed</td><td>Below the meeting-test: the disk embedding cache already covers anchors after first use, so the win is negligible.</td></tr>
+      <tr><td class="n">R2</td><td>Reframe as a general "semantic Likert scorer" for any ordered-preference task (PR clarity, feature triage)</td><td>Scope dilution: broadens the surface away from the named marketing-copy focus; better explored later as a brainstorm variant than as the next product bet.</td></tr>
+      <tr><td class="n">R3</td><td>Community anchor and persona "packs" registry</td><td>Real leverage but premature: contribution value is low until the core trust features (I-1, I-3, I-4) make the instrument worth extending. Sequence after them.</td></tr>
+      <tr><td class="n">R4</td><td>Ship as a CI / GitHub Action to gate copy changes in PRs</td><td>Strong distribution idea but speculative before the scores are trustworthy; gating merges on a noisy signal would backfire. Revisit once I-1 lands.</td></tr>
+      <tr><td class="n">R5</td><td>Poststratification: reweight persona outputs toward a target population</td><td>Heavier and more niche than the current relative-ranking use warrants; risks implying a population-representativeness claim v1 explicitly avoids.</td></tr>
+      <tr><td class="n">R6</td><td>Persona cold-start: generate a defensible persona set from a product URL or brief</td><td>Genuinely useful friction reduction, but persona generation is the skill's job today, and it overlaps I-5 (grounded persona construction) and I-8 (lowering setup friction); folded as a follow-on rather than a separate bet.</td></tr>
+      <tr><td class="n">R7</td><td>Drop the embedding model entirely and have the agent return the Likert distribution directly</td><td>Anti-thesis: the deterministic, inspectable local scoring instrument is the product's reason to exist; removing it would collapse it into the LLM's own judgment.</td></tr>
+      <tr><td class="n">R8</td><td>Scale to bulk catalog scoring (thousands of variants at once)</td><td>Premature scale: optimizes throughput before the per-comparison signal is trustworthy; value is low against the trust gaps.</td></tr>
+      <tr><td class="n">R9</td><td>Swap in a newer local embedding model (BGE-M3, Qwen3-Embedding-0.6B) and address the all-MiniLM license gray area</td><td>Kept as a concrete first use inside I-4 rather than a standalone idea: model choice should be decided by the validation harness measuring which model best preserves known rankings, and the license note documented alongside.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="sources">Sources and References</h2>
+  <ul class="refs">
+    <li>SSR method: <a href="https://arxiv.org/abs/2510.08338">arXiv:2510.08338</a>, "LLMs Reproduce Human Purchase Intent via Semantic Similarity Elicitation of Likert Ratings" (2025).</li>
+    <li>Silicon-sampling critique: Bisbee et al., "Synthetic Replacements for Human Survey Data? The Perils of LLMs," <a href="https://www.cambridge.org/core/journals/political-analysis">Political Analysis</a> 32(4), 2024.</li>
+    <li>Meta-analysis: Sarstedt et al., "Using LLMs to Generate Silicon Samples," <a href="https://www.nim.org/en/publications">Psychology &amp; Marketing</a> 41(6), 2024.</li>
+    <li>Practitioner critique: Nik Samoylov, "Synthetic respondents are the homeopathy of market research," <a href="https://conjointly.com/blog/">Conjointly</a>, Mar 2024.</li>
+    <li>Open benchmarks: <a href="https://arxiv.org/abs/2505.17479">Twin-2K-500 (arXiv:2505.17479)</a>; SimGym (2026, A/B-holdout validation).</li>
+    <li>UX-research skepticism: Nielsen Norman Group, <a href="https://www.nngroup.com/articles/synthetic-users/">"Synthetic Users"</a>.</li>
+    <li>HN persona-cloning experiment: Michael Taylor, <a href="https://every.to/also-true-for-humans/i-cloned-2-000-hacker-news-users-to-predict-viral-posts">Every.to</a>, 2025.</li>
+    <li>Embedding models: <a href="https://huggingface.co/BAAI/bge-m3">BGE-M3</a>, <a href="https://huggingface.co/Qwen/Qwen3-Embedding-0.6B">Qwen3-Embedding-0.6B</a>; <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/discussions/34">all-MiniLM-L6-v2 training-data discussion</a>.</li>
+    <li>Repo: <a href="https://github.com/StartupBros/synthetic-panel">StartupBros/synthetic-panel</a> (<a href="https://github.com/StartupBros/synthetic-panel/blob/main/synthetic_panel/testing.py">testing.py</a>, <a href="https://github.com/StartupBros/synthetic-panel/blob/main/synthetic_panel/scoring.py">scoring.py</a>, <a href="https://github.com/StartupBros/synthetic-panel/blob/main/synthetic_panel/config.py">config.py</a>, <a href="https://github.com/StartupBros/synthetic-panel/blob/main/synthetic_panel/data/anchors.default.yaml">anchors.default.yaml</a>).</li>
+  </ul>
+
+  <footer class="composition-signal">
+    Composed 2026-07-11 by ce-ideate, refreshing the original open-source ideation for <code>synthetic-panel</code> against the shipped v1 codebase and the mid-2026 synthetic-research landscape. External landscape claims are attributed to their sources and some were reached via secondary citations; spot-check before relying on any single figure.
+  </footer>
+
+</main>
+</body>
+</html>
