@@ -21,6 +21,8 @@ import tempfile
 import time
 from pathlib import Path
 
+from .config import _get_embedding_config
+
 __all__ = [
     "get_embedding",
     "get_embeddings_batch",
@@ -157,13 +159,7 @@ class EmbeddingCache:
 
 def _get_cache_key(text: str) -> str:
     """Generate cache key including provider and model for auto-invalidation."""
-    provider = os.environ.get("SSR_EMBEDDING_PROVIDER", "local").lower()
-    if provider == "gemini":
-        model = os.environ.get("SSR_EMBEDDING_MODEL", "gemini-embedding-001")
-    elif provider == "openai":
-        model = os.environ.get("SSR_EMBEDDING_MODEL", "provider-default")
-    else:
-        model = os.environ.get("SSR_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+    provider, model = _get_embedding_config()
 
     text_hash = hashlib.sha256(text.encode()).hexdigest()[:16]
     return f"{provider}:{model}:{text_hash}"
