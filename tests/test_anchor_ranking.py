@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pytest
 
-from synthetic_panel import embeddings
 from synthetic_panel.config import load_default_anchors, load_personas
 from synthetic_panel.scoring import calculate_ssr_score
 
@@ -10,21 +9,11 @@ from synthetic_panel.scoring import calculate_ssr_score
 @pytest.mark.slow
 @pytest.mark.model_dependent
 def test_default_anchors_rank_purchase_intent_ladder_with_local_embeddings(
-    monkeypatch, tmp_path
+    monkeypatch, isolated_embedding_disk_cache
 ):
     monkeypatch.setenv("SSR_EMBEDDING_PROVIDER", "local")
     monkeypatch.setenv("SSR_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
     monkeypatch.setenv("SSR_DIST_TEMPERATURE", "1.0")
-    monkeypatch.setattr(embeddings, "_CACHE_DIR", tmp_path / "embedding-cache")
-    monkeypatch.setattr(
-        embeddings,
-        "_CACHE_PATH_GZ",
-        tmp_path / "embedding-cache" / "embeddings.json.gz",
-    )
-    monkeypatch.setattr(
-        embeddings, "_CACHE_PATH_OLD", tmp_path / "embedding-cache" / "embeddings.json"
-    )
-    embeddings.EmbeddingCache._disk_cache = None
 
     anchors = load_default_anchors(Path("synthetic_panel/data/anchors.default.yaml"))
     personas = load_personas(Path("synthetic_panel/data/personas.example.yaml"))

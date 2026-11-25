@@ -37,23 +37,13 @@ REACTIONS_BY_VARIANT = {
 
 
 @pytest.fixture(autouse=True)
-def local_embedding_env(monkeypatch, tmp_path):
+def local_embedding_env(monkeypatch, isolated_embedding_disk_cache):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     monkeypatch.setenv("SSR_EMBEDDING_PROVIDER", "local")
     monkeypatch.setenv("SSR_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
     monkeypatch.setenv("SSR_DIST_TEMPERATURE", "1.0")
-    monkeypatch.setattr(embeddings, "_CACHE_DIR", tmp_path / "embedding-cache")
-    monkeypatch.setattr(
-        embeddings,
-        "_CACHE_PATH_GZ",
-        tmp_path / "embedding-cache" / "embeddings.json.gz",
-    )
-    monkeypatch.setattr(
-        embeddings, "_CACHE_PATH_OLD", tmp_path / "embedding-cache" / "embeddings.json"
-    )
-    embeddings.EmbeddingCache._disk_cache = None
     embeddings.EmbeddingCache._provider_cache = {}
 
 
