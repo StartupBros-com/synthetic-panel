@@ -31,6 +31,8 @@ name_three="rob""ert"
 
 # The project's own public repo URL legitimately contains the org name, so the
 # brand-term check removes only exact URL prefixes, not the rest of their lines.
+# The root LICENSE has to name the copyright holder, so the check also removes
+# the holder at the start of a notice line there, and nothing else in that file.
 # Keep the filter outside the tolerated no-match grep path: a failed filter must
 # fail the gate rather than silently suppressing every brand hit.
 brand_hits="$({ git grep --no-color -nIiz -E "$brand_term" -- . || [[ $? -eq 1 ]]; } |
