@@ -215,6 +215,17 @@ def test_copyright_holder_is_not_allowed_outside_the_root_license(tmp_path, file
         f"Copyright (c) 2026 {HOLDER}s",
         f"Copyright (c) 2026 {HOLDER}-backed course",
         f"Copyright (c) 2026 The {HOLDER}",
+        f"Copyright (c) 2026 x{HOLDER}",
+        f"Copyright (c) 2026 {BRAND}Media LLC",
+        f"Copyright (c) 2026 {HOLDER}(House of Vibe)",
+        # A year that is not four digits, or not set off by single spaces.
+        f"Copyright (c) 202 {HOLDER}",
+        f"Copyright (c) 20266 {HOLDER}",
+        f"Copyright (c) 2026{HOLDER}",
+        f"Copyright (c) 2026  {HOLDER}",
+        f"Copyright (c)2026 {HOLDER}",
+        f"Copyright (c)  2026 {HOLDER}",
+        f"Copyright (c)\t2026 {HOLDER}",
         # Not a notice line of the license's own shape.
         f"Portions Copyright (c) 2026 {HOLDER}",
         f" Copyright (c) 2026 {HOLDER}",

@@ -22,7 +22,7 @@ LICENSE_PATH = b"LICENSE"
 COPYRIGHT_HOLDER = re.compile(
     rb"^Copyright \(c\) \d{4}(?:\s*[-,]\s*\d{4})* "
     + re.escape(BRAND)
-    + rb" LLC(?=$|[\s,.(])",
+    + rb" LLC(?=$|[\s,.])",
     re.IGNORECASE,
 )
 
