@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 BRAND = "Startup" + "Bros"
 LEGACY_URL = f"https://github.com/{BRAND}/synthetic-panel"
 CANONICAL_URL = f"https://github.com/{BRAND}-com/synthetic-panel"
+HOLDER = f"{BRAND} LLC"
+HOLDER_LINE = f"Copyright (c) 2026 {HOLDER} (House of Vibe, https://houseofvibe.ai)"
 
 
 def run_gate(tmp_path, content, filename="sample.md"):
@@ -160,3 +162,126 @@ def test_tracked_data_blobs_still_fail(tmp_path, filename):
     assert result.returncode == 1
     assert "Tracked data blob hits:" in result.stdout
     assert filename in result.stdout
+
+
+@pytest.mark.parametrize(
+    "notice",
+    [
+        HOLDER_LINE,
+        f"Copyright (c) 2026 {HOLDER}",
+        f"Copyright (c) 2025-2026 {HOLDER} (House of Vibe, https://houseofvibe.ai)",
+        f"Copyright (c) 2025, 2026 {HOLDER}",
+        f"Copyright (c) 2026 {HOLDER}. All rights reserved.",
+        f"Copyright (c) 2026 {HOLDER}, and contributors",
+    ],
+)
+def test_root_license_may_name_the_copyright_holder(tmp_path, notice):
+    result = run_gate(tmp_path, f"MIT License\n\n{notice}\n\nPermission is granted.\n", "LICENSE")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "RELEASE GATE: CLEAN" in result.stdout
+
+
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "sample.md",
+        "README.md",
+        "NOTICE",
+        "LICENSE.md",
+        "LICENSE.txt",
+        "license",
+        "docs/LICENSE",
+        "LICENSE/notes.md",
+        "skill/LICENSE",
+    ],
+)
+def test_copyright_holder_is_not_allowed_outside_the_root_license(tmp_path, filename):
+    result = run_gate(tmp_path, HOLDER_LINE + "\n", filename)
+    assert result.returncode == 1
+    assert f"{filename}:1:{HOLDER_LINE}" in result.stdout
+    assert "RELEASE GATE: FAIL" in result.stdout
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        # The brand a second time on the notice line.
+        f"Copyright (c) 2026 {HOLDER} ({BRAND}, https://houseofvibe.ai)",
+        f"Copyright (c) 2026 {HOLDER} (https://{BRAND.lower()}.com)",
+        f"Copyright (c) 2026 {HOLDER} and {BRAND} Media",
+        # A holder that is not exactly the company.
+        f"Copyright (c) 2026 {BRAND}",
+        f"Copyright (c) 2026 {BRAND} Media LLC",
+        f"Copyright (c) 2026 {HOLDER}s",
+        f"Copyright (c) 2026 {HOLDER}-backed course",
+        f"Copyright (c) 2026 The {HOLDER}",
+        f"Copyright (c) 2026 x{HOLDER}",
+        f"Copyright (c) 2026 {BRAND}Media LLC",
+        f"Copyright (c) 2026 {HOLDER}(House of Vibe)",
+        # A year that is not four digits, or not set off by single spaces.
+        f"Copyright (c) 202 {HOLDER}",
+        f"Copyright (c) 20266 {HOLDER}",
+        f"Copyright (c) 2026{HOLDER}",
+        f"Copyright (c) 2026  {HOLDER}",
+        f"Copyright (c)2026 {HOLDER}",
+        f"Copyright (c)  2026 {HOLDER}",
+        f"Copyright (c)\t2026 {HOLDER}",
+        # Not a notice line of the license's own shape.
+        f"Portions Copyright (c) 2026 {HOLDER}",
+        f" Copyright (c) 2026 {HOLDER}",
+        f"Copyright (c) {HOLDER}",
+        f"Copyright 2026 {HOLDER}",
+        f"Built by {HOLDER}",
+        f"{HOLDER}",
+    ],
+)
+def test_root_license_allows_nothing_but_the_holder_of_a_notice_line(tmp_path, line):
+    result = run_gate(tmp_path, f"MIT License\n\n{line}\n", "LICENSE")
+    assert result.returncode == 1
+    assert f"LICENSE:3:{line}" in result.stdout
+    assert "RELEASE GATE: FAIL" in result.stdout
+
+
+def test_root_license_notice_does_not_hide_a_brand_mention_on_another_line(tmp_path):
+    content = f"MIT License\n\n{HOLDER_LINE}\n\nSupport: {BRAND} members only.\n"
+    result = run_gate(tmp_path, content, "LICENSE")
+    assert result.returncode == 1
+    assert f"LICENSE:5:Support: {BRAND} members only." in result.stdout
+    assert f"LICENSE:3:{HOLDER_LINE}" not in result.stdout
+
+
+@pytest.mark.parametrize(
+    "term", ["side" + " business", "sur" + "vey responses", "Mi" + "ke"]
+)
+def test_other_prohibited_terms_still_fail_on_the_notice_line(tmp_path, term):
+    line = f"{HOLDER_LINE} {term}"
+    result = run_gate(tmp_path, line + "\n", "LICENSE")
+    assert result.returncode == 1
+    assert f"LICENSE:1:{line}" in result.stdout
+
+
+def test_this_repository_passes_its_own_gate_with_the_company_notice(tmp_path):
+    """The tracked tree as it is, with the root LICENSE naming the company."""
+    repo = tmp_path / "copy"
+    tracked = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, check=True
+    ).stdout.split(b"\0")
+    for name in filter(None, tracked):
+        source = ROOT / name.decode()
+        target = repo / name.decode()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+    license_text = (repo / "LICENSE").read_text()
+    notice = [line for line in license_text.splitlines() if line.startswith("Copyright")]
+    assert notice, "the root LICENSE has no copyright notice"
+    (repo / "LICENSE").write_text(license_text.replace(notice[0], HOLDER_LINE, 1))
+    subprocess.run(["git", "init", "--quiet", str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repo), "add", "."], check=True)
+    result = subprocess.run(
+        ["bash", str(repo / "scripts/release_gate.sh")],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "RELEASE GATE: CLEAN" in result.stdout
