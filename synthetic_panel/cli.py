@@ -16,7 +16,6 @@ except ImportError:
 
 import yaml
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
 
 from .config import get_persona_names, load_default_anchors, load_personas
@@ -24,6 +23,7 @@ from .testing import (
     DEFAULT_N_SAMPLES,
     DEFAULT_STIMULUS_TYPE,
     SeamInputError,
+    _display_results,
     emit_prompt_handoff,
     score_reaction_handoff,
     write_prompt_handoff,
@@ -41,31 +41,7 @@ class CLIError(Exception):
 
 def display_results(persona_name: str, persona_full_name: str, results: list):
     """Display legacy test results in a formatted table."""
-    table = Table(title=f"Results for {persona_full_name}")
-    table.add_column("Rank", style="cyan", width=4)
-    table.add_column("Variation", style="white", max_width=50)
-    table.add_column("Score", style="green", width=6)
-    table.add_column("Confidence", style="yellow", width=12)
-
-    for i, result in enumerate(results, 1):
-        score = result["score"]
-        filled = int((score - 1) / 4 * 10)
-        bar = "█" * filled + "░" * (10 - filled)
-        variation = result["content"]
-        if len(variation) > 47:
-            variation = variation[:47] + "..."
-        table.add_row(str(i), variation, f"{score:.2f}", bar)
-
-    stdout_console.print(table)
-    if results:
-        top = results[0]
-        stdout_console.print(
-            Panel(
-                top["response"][:500] + ("..." if len(top["response"]) > 500 else ""),
-                title="[bold green]Top Performer Rationale[/bold green]",
-                subtitle=f"Score: {top['score']:.2f}",
-            )
-        )
+    _display_results(stdout_console, persona_full_name, results)
 
 
 def _load_variants(args: argparse.Namespace) -> dict[str, str]:

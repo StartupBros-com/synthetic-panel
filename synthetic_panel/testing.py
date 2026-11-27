@@ -1532,6 +1532,11 @@ def run_test(
 
 def display_results(persona_name: str, persona_full_name: str, results: list):
     """Display test results in a formatted table."""
+    _display_results(console, persona_full_name, results)
+
+
+def _display_results(console: Console, persona_full_name: str, results: list) -> None:
+    """Display test results in a formatted table."""
     from rich.table import Table
 
     table = Table(title=f"Results for {persona_full_name}")
