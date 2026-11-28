@@ -38,6 +38,12 @@ class ScoringTemperatureTests(unittest.TestCase):
                 self.assertAlmostEqual(distribution[4], 1.0, delta=1e-12)
                 self.assertAlmostEqual(score, 5.0, delta=1e-12)
 
+    def test_tiny_temperature_distinguishes_adjacent_anchor_weights(self):
+        evidence = [0.0, 0.0, 0.9, 0.8, math.nextafter(0.9, 1.0)]
+        score, distribution = self.score(evidence, 5e-324)
+        self.assertEqual(distribution, [0.0, 0.0, 0.0, 0.0, 1.0])
+        self.assertEqual(score, 5.0)
+
     def test_tiny_temperature_keeps_max_ties_and_true_no_signal(self):
         for temperature in (0.001, 5e-324):
             with self.subTest(temperature=temperature):

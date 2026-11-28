@@ -67,12 +67,12 @@ def _calculate_single_set_distribution(
     else:
         raw_probs = {k: 0.2 for k in range(1, 6)}
 
-    # Equation 9: subtract the largest log probability before dividing by T.
-    # This common factor cancels on normalization and keeps a max weight at 1
-    # even when 1 / T would overflow or all unshifted powers would underflow.
-    max_log_prob = math.log(max(raw_probs.values()))
+    # Equation 9: scale relative to the largest probability before taking logs.
+    # This keeps a max weight at 1 and preserves distinct near-max weights
+    # that can round to the same value if logged separately.
+    max_prob = max(raw_probs.values())
     temp_scaled = {
-        k: math.exp((math.log(p) - max_log_prob) / temperature) if p > 0 else 0
+        k: math.exp(math.log(p / max_prob) / temperature) if p > 0 else 0
         for k, p in raw_probs.items()
     }
 
