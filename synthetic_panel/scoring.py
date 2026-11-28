@@ -8,6 +8,7 @@ The algorithm compares LLM response embeddings to reference anchor statements
 to produce probability distributions over Likert scale ratings.
 """
 
+import math
 import os
 
 from .config import is_multi_set_format
@@ -66,9 +67,13 @@ def _calculate_single_set_distribution(
     else:
         raw_probs = {k: 0.2 for k in range(1, 6)}
 
-    # Apply temperature scaling: p^(1/T) (Equation 9)
+    # Equation 9: scale relative to the largest probability before taking logs.
+    # This keeps a max weight at 1 and preserves distinct near-max weights
+    # that can round to the same value if logged separately.
+    max_prob = max(raw_probs.values())
     temp_scaled = {
-        k: (p ** (1.0 / temperature)) if p > 0 else 0 for k, p in raw_probs.items()
+        k: math.exp(math.log(p / max_prob) / temperature) if p > 0 else 0
+        for k, p in raw_probs.items()
     }
 
     # Re-normalize after temperature scaling

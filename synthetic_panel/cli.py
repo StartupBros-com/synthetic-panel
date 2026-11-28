@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -184,6 +185,17 @@ def _score_reactions(args: argparse.Namespace) -> int:
     return 0
 
 
+def _positive_finite_temperature(raw: str) -> float:
+    message = "must be a finite number greater than zero"
+    try:
+        temperature = float(raw)
+    except ValueError:
+        raise argparse.ArgumentTypeError(message) from None
+    if not math.isfinite(temperature) or temperature <= 0:
+        raise argparse.ArgumentTypeError(message)
+    return temperature
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Emit prompts and score returned reactions for synthetic-panel.",
@@ -215,7 +227,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     score.add_argument("reactions_file", help="Path to reactions JSON file")
     score.add_argument("--anchors-file", help="Optional anchor YAML file")
-    score.add_argument("--dist-temperature", type=float, default=1.0)
+    score.add_argument("--dist-temperature", type=_positive_finite_temperature, default=1.0)
     score.add_argument("--output", "-o", help="Output result JSON path")
     score.add_argument(
         "--json", action="store_true", help="Print stable parseable JSON"
