@@ -27,9 +27,7 @@ jobs:
           key: hf-minilm-${{ runner.os }}
 
       - name: Install package + test deps
-        run: |
-          uv sync --locked --python 3.12
-          uv pip install pytest
+        run: uv sync --locked --python 3.12
 
       - name: Run tests
         run: uv run --locked python -m pytest tests/ -q
