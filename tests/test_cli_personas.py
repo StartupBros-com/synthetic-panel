@@ -65,6 +65,25 @@ def test_emit_persona_input_error_has_no_output(tmp_path, body, diagnostic):
     assert set(tmp_path.iterdir()) == before
 
 
+@pytest.mark.parametrize("kind", ["directory", "invalid-encoding"])
+def test_emit_persona_read_error_has_no_output(tmp_path, kind):
+    source = tmp_path / "personas.yaml"
+    output = tmp_path / "prompts.json"
+    if kind == "directory":
+        source.mkdir()
+        diagnostic = "could not read persona file"
+    else:
+        source.write_bytes(b"name: \xff\n")
+        diagnostic = "invalid persona YAML"
+
+    completed = _emit(source, output)
+
+    assert completed.returncode == 2
+    assert completed.stdout == ""
+    assert completed.stderr == f"error: {diagnostic}: {source}\n"
+    assert set(tmp_path.iterdir()) == {source}
+
+
 def test_emit_valid_persona_mapping_writes_and_prints_handoff(tmp_path):
     persona_path = tmp_path / "persona.yaml"
     persona_path.write_text(
