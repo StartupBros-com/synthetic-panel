@@ -184,9 +184,14 @@ def emit_prompt_handoff(
     }
 
 
+def _serialize_handoff(payload: dict) -> str:
+    """Render handoff data as stable JSON, without a trailing newline."""
+    return json.dumps(payload, indent=2, sort_keys=True)
+
+
 def write_prompt_handoff(prompt_handoff: dict, output_path: str | Path) -> None:
     """Write a prompt handoff object as stable JSON."""
-    Path(output_path).write_text(json.dumps(prompt_handoff, indent=2, sort_keys=True))
+    Path(output_path).write_text(_serialize_handoff(prompt_handoff))
 
 
 def score_reaction_handoff(

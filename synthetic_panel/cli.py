@@ -27,6 +27,7 @@ from .testing import (
     emit_prompt_handoff,
     score_reaction_handoff,
     write_prompt_handoff,
+    _serialize_handoff,
 )
 
 __all__ = ["main", "display_results"]
@@ -133,7 +134,7 @@ def _emit_prompts(args: argparse.Namespace) -> int:
         write_prompt_handoff(handoff, args.output)
 
     if args.json or not args.output:
-        print(json.dumps(handoff, indent=2, sort_keys=True))
+        print(_serialize_handoff(handoff))
     else:
         record_count = len(handoff["records"])
         stdout_console.print(f"Wrote {record_count} prompts to {args.output}")
@@ -161,10 +162,10 @@ def _score_reactions(args: argparse.Namespace) -> int:
         raise CLIError(message) from exc
 
     if args.output:
-        Path(args.output).write_text(json.dumps(result, indent=2, sort_keys=True))
+        Path(args.output).write_text(_serialize_handoff(result))
 
     if args.json:
-        print(json.dumps(result, indent=2, sort_keys=True))
+        print(_serialize_handoff(result))
     else:
         verdict = result["comparability"]["verdict"]
         stdout_console.print(f"Comparability: {verdict}")
