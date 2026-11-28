@@ -100,16 +100,19 @@ def _load_variants(args: argparse.Namespace) -> dict[str, str]:
 
 def _load_personas_for_cli(path: str | None) -> dict:
     persona_path = Path(path) if path else None
-    if persona_path and not persona_path.exists():
-        raise CLIError(f"missing persona file: {persona_path}")
+    source = persona_path or "default personas"
     try:
         personas = load_personas(persona_path)
     except FileNotFoundError as exc:
-        raise CLIError(
-            f"missing persona file: {persona_path or 'default personas'}"
-        ) from exc
+        raise CLIError(f"missing persona file: {source}") from exc
+    except OSError as exc:
+        raise CLIError(f"could not read persona file: {source}") from exc
+    except (UnicodeDecodeError, yaml.YAMLError) as exc:
+        raise CLIError(f"invalid persona YAML: {source}") from exc
+    if personas and not isinstance(personas, dict):
+        raise CLIError(f"invalid persona file: {source} must contain a mapping")
     if not personas or not get_persona_names(personas):
-        raise CLIError(f"empty persona file: {persona_path or 'default personas'}")
+        raise CLIError(f"empty persona file: {source}")
     return personas
 
 
